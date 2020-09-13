@@ -2,6 +2,7 @@ import os
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
+import json
 
 from models import db,Commands,Suggestion,Category,setup_db
 
@@ -26,51 +27,58 @@ def create_app(test_config=None):
   @cross_origin()
   def get_commands():
     all_commands = Commands.query.all()
+    commands_formatted = [ command.format() for command in all_commands ]
 
     if(len(all_commands) == 0):
       abort(404)
 
     return jsonify({
       'success': True,
-      'all_commands':all_commands
+      'all_commands':commands_formatted
     })
 
   @app.route('/commands/<int:category_id>')
   @requires_auth('get:categorised-commands')
   def get_categorised_commands(payload,category_id):
     commands_for_cat = Commands.query.filter(Commands.category == category_id)
+    commands_formatted = [ command.format() for command in commands_for_cat ]
     return jsonify({
       'success':True,
-      'commands':commands_for_cat
+      'commands':commands_formatted
     })
 
   @app.route('/categories')
   @requires_auth('get:categories')
   def get_categories(payload):
     cats = Category.query.all()
+    formatted_categories = [ cat.format() for cat in cats ]
     return jsonify({
       'success':True,
-      'categories':cats
+      'categories':formatted_categories
     })
 
   @app.route('/commands', methods=['POST'])
   @requires_auth('post:commands')
   def add_commands(payload):
     try:
-      body = request.get_json()
-      command = body.get('command',None)
-      category = body.get('category',None)
-      explanation = body.get('explanation',None)
+      #body = request.get_json()
+      command = request.json.get('command')
+      category = request.json.get('category')
+      explanation = request.json.get('explanation')
+
+      if command is None or category is None or explanation is None:
+        abort(400)
 
       new_command = Commands(command=command,category=category,explanation=explanation)
       new_command.insert()
 
       all_commands = Commands.query.all()
+      formatted_command = [ comma.format() for comma in all_commands ]
 
       return jsonify({
         'success':True,
-        'new_command':new_command,
-        'all_commands':all_commands
+        'new_command':new_command.format(),
+        'all_commands':formatted_command
       })
     except:
       abort(405)
@@ -84,33 +92,36 @@ def create_app(test_config=None):
       abort(404)
 
     command.delete()
+    all_commands = Commands.query.all()
+    formatted_command = [ comma.format() for comma in all_commands ]
+
+    command.delete()
     return jsonify({
       'success':True,
-      'all_commands':Commands.query.all()
+      'all_commands':formatted_command
     })
 
   @app.route('/commands/<int:command_id>',methods=['PATCH'])
   @requires_auth('patch:commands')
   def alter_command(jwt,command_id):
-    command = Command.query.get(command_id)
-    if not command:
+    comm = Commands.query.filter(Commands.id == command_id).first()
+    if not comm:
       abort(404)
 
-    body = request.get_json()
-    command = body.get('command',None)
-    category = body.get('category',None)
-    explanation = body.get('explanation',None)
+    body = request.get_json(force=True)
+    comm.command = json.dumps(body.get('command', comm.command))
+    comm.category = json.dumps(body.get('category', comm.category))
+    comm.explanation = json.dumps(body.get('explanation', comm.explanation))
 
-    head = request.get_json(force=True)
-    command.title = json.dumps(head.get('command'))
-    command.category = json.dumps(head.get('category'))
-    command.explanation = json.dumps(head.get('explanation'))
-    command.update()
+    comm.update()
+
+    all_commands = Commands.query.all()
+    formatted_command = [ comma.format() for comma in all_commands ]
 
     return jsonify({
         'success':True,
-        'updated_command' : Commands.query.get(command_id),
-        'commands': Commands.query.all()
+        'updated_command' : Commands.query.get(command_id).format(),
+        'commands': formatted_command
     })
 
   @app.route('/suggestions',methods=['POST'])
@@ -124,29 +135,32 @@ def create_app(test_config=None):
     new_sug.insert()
 
     all_suggestions = Suggestion.query.all()
+    formatted_sugg = [ sug.format() for sug in all_suggestions ]
     return jsonify({
       'success':True,
-      'all_suggestion':all_suggestions
+      'all_suggestion':formatted_sugg
     })
 
   @app.route('/suggestions')
   @requires_auth('get:suggestions')
   def get_suggestons(payload):
     suggestions = Suggestion.query.all()
+    formatted_sugg = [ sug.format() for sug in suggestions ]
     return jsonify({
       'success':True,
-      'suggestions':suggestions
+      'suggestions':formatted_sugg
     })
 
   @app.route('/suggestions/<int:sug_id>',methods=['DELETE'])
   @requires_auth('delete:suggestions')
   def delete_suggestions(jwt,sug_id):
-    sug = Suggestion.query.get(sug_id)
-    sug.delete()
-
+    suggestions = Suggestion.query.filter(Suggestion.id == sug_id)
+    suggestions.delete()
+    all_suggestion = Suggestion.query.all()
+    formatted_sugg = [ sug.format() for sug in all_suggestion ]
     return jsonify({
       'success':True,
-      'suggestions':Suggestion.query.all()
+      'suggestions':formatted_sugg
     })
 
   @app.errorhandler(404)
