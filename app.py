@@ -40,8 +40,8 @@ def create_app(test_config=None):
   @app.route('/commands/<int:category_id>')
   @requires_auth('get:categorised-commands')
   def get_categorised_commands(payload,category_id):
-    commands_for_cat = Commands.query.filter(Commands.category == category_id)
-    if len(commands_for_cat) == 0:
+    commands_for_cat = Commands.query.filter(Commands.category == category_id).all()
+    if(len(commands_for_cat) == 0):
       abort(404)
     commands_formatted = [ command.format() for command in commands_for_cat ]
     return jsonify({
@@ -49,7 +49,7 @@ def create_app(test_config=None):
       'commands':commands_formatted
     })
 
-  @app.route('/categories/')
+  @app.route('/categories')
   @requires_auth('get:categories')
   def get_categories(payload):
     cats = Category.query.all()
@@ -89,7 +89,7 @@ def create_app(test_config=None):
   @app.route('/commands/<int:command_id>',methods=['DELETE'])
   @requires_auth('delete:commands')
   def delete_command(jwt,command_id):
-    command = Commands.query.filter(Commands.id == command_id)
+    command = Commands.query.filter(Commands.id == command_id).first()
     if not command:
       abort(404)
 
@@ -156,7 +156,9 @@ def create_app(test_config=None):
   @app.route('/suggestions/<int:sug_id>',methods=['DELETE'])
   @requires_auth('delete:suggestions')
   def delete_suggestions(jwt,sug_id):
-    suggestions = Suggestion.query.filter(Suggestion.id == sug_id)
+    suggestions = Suggestion.query.filter(Suggestion.id == sug_id).first()
+    if not suggestions:
+      abort(404)
     suggestions.delete()
     all_suggestion = Suggestion.query.all()
     formatted_sugg = [ sug.format() for sug in all_suggestion ]
@@ -180,6 +182,14 @@ def create_app(test_config=None):
         "error":405,
         "message":"method not allowed"
     })
+  
+  @app.errorhandler(400)
+  def bad_request(error):
+    return jsonify({
+        "success": False,
+        "error": 400,
+        "message": "Bad Request"
+    }), 400
 
   return app
 
