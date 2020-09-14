@@ -41,13 +41,15 @@ def create_app(test_config=None):
   @requires_auth('get:categorised-commands')
   def get_categorised_commands(payload,category_id):
     commands_for_cat = Commands.query.filter(Commands.category == category_id)
+    if len(commands_for_cat) == 0:
+      abort(404)
     commands_formatted = [ command.format() for command in commands_for_cat ]
     return jsonify({
       'success':True,
       'commands':commands_formatted
     })
 
-  @app.route('/categories')
+  @app.route('/categories/')
   @requires_auth('get:categories')
   def get_categories(payload):
     cats = Category.query.all()
