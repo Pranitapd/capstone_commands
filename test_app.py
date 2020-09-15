@@ -42,12 +42,6 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(len(data['all_commands']))
 
-    # def test_404_get_commands(self):  #didnt check
-    #     res = self.client().get('/commands/')
-    #     data = json.loads(res.data)
-    #     self.assertEqual(res.status_code, 404)
-    #     self.assertEqual(data['success'], False)
-
     def test_get_categorised_commands(self):
         res = self.client().get('/commands/2',headers={'Authorization': 'Bearer ' + self.admin})
         data = json.loads(res.data)
@@ -69,34 +63,34 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(len(data['categories']))
 
-    # def test_add_commands(self):  #working
-    #     res = self.client().post('/commands',headers={'Authorization': 'Bearer ' + self.admin},json=self.new_command)
-    #     data = json.loads(res.data)
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(len(data['new_command']))
+    def test_add_commands(self): 
+        res = self.client().post('/commands',headers={'Authorization': 'Bearer ' + self.admin},json=self.new_command)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['new_command']))
 
-    # def test_delete_commands(self):  #working
-    #     res = self.client().delete('/commands/7',headers={'Authorization': 'Bearer ' + self.admin})
-    #     data = json.loads(res.data)
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(len(data['all_commands']))
+    def test_delete_commands(self):  
+        res = self.client().delete('/commands/7',headers={'Authorization': 'Bearer ' + self.admin})
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['all_commands']))
 
-    # def test_update_commands(self):  #working
-    #     res = self.client().patch('/commands/4',headers={'Authorization': 'Bearer ' + self.admin},json={'command':'SELECT * FROM TABLENAME;'})
-    #     data = json.loads(res.data)
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(len(data['updated_command']))
-    #     self.assertTrue(len(data['commands']))
+    def test_update_commands(self):  
+        res = self.client().patch('/commands/4',headers={'Authorization': 'Bearer ' + self.admin},json={'command':'SELECT * FROM TABLENAME;'})
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['updated_command']))
+        self.assertTrue(len(data['commands']))
 
-    # def test_add_suggestion(self):   #working
-    #     res = self.client().post('/suggestions',headers={'Authorization': 'Bearer ' + self.admin},json={'suggestion':'Please add command for maximum value in column','category':4} )
-    #     data = json.loads(res.data)
-    #     self.assertEqual(res.status_code,200)
-    #     self.assertEqual(data['success'],True)
-    #     self.assertTrue(len(data['all_suggestion']))
+    def test_add_suggestion(self):  
+        res = self.client().post('/suggestions',headers={'Authorization': 'Bearer ' + self.admin},json={'suggestion':'Please add command for maximum value in column','category':4} )
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code,200)
+        self.assertEqual(data['success'],True)
+        self.assertTrue(len(data['all_suggestion']))
 
 
     def test_get_suggestion(self):
@@ -106,12 +100,12 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(data['success'],True)
         self.assertTrue(len(data['suggestions']))
 
-    # def test_delete_suggestion(self): #working
-    #     res = self.client().delete('/suggestions/4',headers={'Authorization': 'Bearer ' + self.admin})
-    #     data = json.loads(res.data)
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(len(data['suggestions']))
+    def test_delete_suggestion(self):
+        res = self.client().delete('/suggestions/4',headers={'Authorization': 'Bearer ' + self.admin})
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['suggestions']))
 
     def test_delete_suggestion_not_found(self):
         res = self.client().delete('/suggestions/7',headers={'Authorization': 'Bearer ' + self.admin})
