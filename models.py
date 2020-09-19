@@ -5,7 +5,7 @@ import os
 from flask_migrate import Migrate
 
 database_name = "capstone1"
-database_path = "postgres://aerftalqxcofko:44eeb868f078d848bd2e1916025d4a377fb7398068c29e86ba68a5383d9cbec7@ec2-52-200-134-180.compute-1.amazonaws.com:5432/daka35ldpv77ur"
+database_path = "postgres://laruynydptixbq:0691c6bb2a9c3d378d238e6a678185f252dd3b2c7245b0f7a242fc32a7ff3842@ec2-3-214-4-151.compute-1.amazonaws.com:5432/deuhak7u65lpbd"
 #database_path = "postgres://{}:{}@{}/{}".format('postgres','Pranita123','localhost:5432', database_name)
 
 db = SQLAlchemy()
