@@ -19,7 +19,7 @@ def create_app(test_config=None):
 
   @app.route('/')
   def login():
-    return '<h1>Hello World! This is the project to get language for any commands</h1>'
+    return '<h1>Hello World! Project: Little Tech Helper </h1>'
 
   @app.after_request
   def after_request(response):
