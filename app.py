@@ -17,6 +17,10 @@ def create_app(test_config=None):
   CORS(app, resources={r"/api/*": {"origins": "*"}})
   app.config['CORS_HEADERS'] = 'Content-Type'
 
+  @app.route('/')
+  def login():
+    return '<h1>Hello World! This is the project to get language for any commands</h1>'
+
   @app.after_request
   def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
